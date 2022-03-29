@@ -30,8 +30,14 @@ func voiceJoined(s *discordgo.Session, newState *discordgo.VoiceState) {
 		return
 	}
 
+	user, err := s.User(newState.UserID)
+	if err != nil {
+		utils.Error("Error while fetching user: " + err.Error())
+		return
+	}
+
 	channel, err := s.GuildChannelCreateComplex(newState.GuildID, discordgo.GuildChannelCreateData{
-		Name:     "🔊 ",
+		Name:     "🔊 " + user.Username,
 		Type:     discordgo.ChannelTypeGuildVoice,
 		ParentID: parentId,
 		PermissionOverwrites: []*discordgo.PermissionOverwrite{
@@ -44,25 +50,25 @@ func voiceJoined(s *discordgo.Session, newState *discordgo.VoiceState) {
 	})
 
 	if err != nil {
-		utils.ErrorEmbed("ErrorEmbed while creating voice channel: " + err.Error())
+		utils.Error("Error while creating voice channel: " + err.Error())
 		return
 	}
 
 	if err = s.GuildMemberMove(newState.GuildID, newState.UserID, &channel.ID); err != nil {
-		utils.ErrorEmbed("ErrorEmbed while moving member: " + err.Error())
+		utils.Error("Error while moving member: " + err.Error())
 	}
 }
 
 func voiceLeft(s *discordgo.Session, oldState *discordgo.VoiceState) {
 	channel, err := s.Channel(oldState.ChannelID)
 	if err != nil {
-		utils.ErrorEmbed("ErrorEmbed fetching channel: " + err.Error())
+		utils.Error("Error fetching channel: " + err.Error())
 		return
 	}
 
 	if channel.Type == discordgo.ChannelTypeGuildVoice && channel.MemberCount == 0 {
 		if _, err = s.ChannelDelete(oldState.ChannelID); err != nil {
-			utils.ErrorEmbed("ErrorEmbed deleting channel: " + err.Error())
+			utils.Error("Error deleting channel: " + err.Error())
 		}
 	}
 }

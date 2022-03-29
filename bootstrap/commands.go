@@ -9,7 +9,7 @@ import (
 
 func RegisterCommands(sess *discordgo.Session) {
 	router := dgc.Create(&dgc.Router{
-		Prefixes:    []string{viper.GetString("prefix")},
+		Prefixes:    []string{viper.GetString("bot.prefix")},
 		BotsAllowed: false,
 		Commands: []*dgc.Command{
 			&C.Help,
