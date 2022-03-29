@@ -1,1 +1,1 @@
-# A7X Discord Bot
+# Judy bot
