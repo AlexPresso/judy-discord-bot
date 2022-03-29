@@ -16,7 +16,7 @@ var Help = dgc.Command{
 	Handler: func(ctx *dgc.Ctx) {
 		var commands = ""
 		var descriptions = ""
-		prefix := viper.GetString("prefix")
+		prefix := viper.GetString("bot.prefix")
 
 		for _, cmd := range ctx.Router.Commands {
 			if utils.CanRunCommand(cmd.Flags, ctx.Event.Member, ctx.Event.Author.ID) {

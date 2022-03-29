@@ -18,7 +18,7 @@ func InitializeBot() (sess *discordgo.Session) {
 	sess.Identify.Intents = discordgo.IntentsGuilds |
 		discordgo.IntentsGuildVoiceStates |
 		discordgo.IntentsGuildMembers |
-		discordgo.IntentsMessageContent
+		discordgo.IntentsGuildMessages
 
 	sess.AddHandler(H.Ready)
 	sess.AddHandler(H.VoiceStateUpdate)

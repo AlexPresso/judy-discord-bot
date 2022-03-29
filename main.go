@@ -20,11 +20,12 @@ func init() {
 
 func main() {
 	sess := Boot.InitializeBot()
-	Boot.RegisterCommands(sess)
 
 	defer func() {
 		sc := make(chan os.Signal, 1)
 		signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 		<-sc
 	}()
+
+	Boot.RegisterCommands(sess)
 }
