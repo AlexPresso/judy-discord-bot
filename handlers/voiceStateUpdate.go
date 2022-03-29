@@ -88,8 +88,8 @@ func voiceChannelChanged(s *discordgo.Session, oldState *discordgo.VoiceState, n
 	voiceJoined(s, newState)
 }
 
-func getVoiceUserCount(guild *discordgo.Guild, channel string) int {
-	count := 0
+func getVoiceUserCount(guild *discordgo.Guild, channel string) (count int) {
+	count = 0
 
 	for _, state := range guild.VoiceStates {
 		if state.ChannelID == channel {
@@ -97,5 +97,5 @@ func getVoiceUserCount(guild *discordgo.Guild, channel string) int {
 		}
 	}
 
-	return count
+	return
 }

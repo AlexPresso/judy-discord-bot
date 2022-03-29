@@ -20,7 +20,9 @@ func InitializeBot() (sess *discordgo.Session) {
 		discordgo.IntentsGuildMembers |
 		discordgo.IntentsGuildMessages
 
+	sess.AddHandler(H.Connect)
 	sess.AddHandler(H.Ready)
+	sess.AddHandler(H.Disconnect)
 	sess.AddHandler(H.VoiceStateUpdate)
 
 	err = sess.Open()
