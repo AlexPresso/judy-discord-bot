@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"github.com/caillouxetbatons/discord-bot/utils"
+	"github.com/alexpresso/judy/utils"
 	"github.com/lus/dgc"
 	"github.com/spf13/viper"
 )

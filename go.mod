@@ -1,4 +1,4 @@
-module github.com/caillouxetbatons/discord-bot
+module github.com/alexpresso/judy
 
 go 1.17
 

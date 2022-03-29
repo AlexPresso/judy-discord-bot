@@ -1,8 +1,8 @@
 package bootstrap
 
 import (
+	C "github.com/alexpresso/judy/commands"
 	"github.com/bwmarrin/discordgo"
-	C "github.com/caillouxetbatons/discord-bot/commands"
 	"github.com/lus/dgc"
 	"github.com/spf13/viper"
 )

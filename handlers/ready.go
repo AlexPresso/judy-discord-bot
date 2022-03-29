@@ -1,8 +1,8 @@
 package handlers
 
 import (
+	"github.com/alexpresso/judy/utils"
 	"github.com/bwmarrin/discordgo"
-	"github.com/caillouxetbatons/discord-bot/utils"
 	"github.com/spf13/viper"
 )
 
