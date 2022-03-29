@@ -1,0 +1,9 @@
+{
+  "token": "",
+  "owner": "",
+  "prefix": "!",
+  "cmdChannel": "123456789",
+  "createVoiceChannels": {
+    "123456789": "123456789"
+  }
+}

@@ -1,0 +1,22 @@
+package bootstrap
+
+import (
+	"github.com/bwmarrin/discordgo"
+	C "github.com/caillouxetbatons/discord-bot/commands"
+	"github.com/lus/dgc"
+	"github.com/spf13/viper"
+)
+
+func RegisterCommands(sess *discordgo.Session) {
+	router := dgc.Create(&dgc.Router{
+		Prefixes:    []string{viper.GetString("prefix")},
+		BotsAllowed: false,
+		Commands: []*dgc.Command{
+			&C.Help,
+			&C.Infos,
+		},
+		Middlewares: []dgc.Middleware{C.PermissionMiddleware},
+	})
+
+	router.Initialize(sess)
+}
