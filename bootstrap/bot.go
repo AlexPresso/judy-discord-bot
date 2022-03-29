@@ -1,9 +1,9 @@
 package bootstrap
 
 import (
+	H "github.com/alexpresso/judy/handlers"
+	"github.com/alexpresso/judy/utils"
 	"github.com/bwmarrin/discordgo"
-	H "github.com/caillouxetbatons/discord-bot/handlers"
-	"github.com/caillouxetbatons/discord-bot/utils"
 	"github.com/spf13/viper"
 	"log"
 )

@@ -1,8 +1,8 @@
 package commands
 
 import (
+	"github.com/alexpresso/judy/utils"
 	"github.com/bwmarrin/discordgo"
-	"github.com/caillouxetbatons/discord-bot/utils"
 	"github.com/lus/dgc"
 	"github.com/spf13/viper"
 )
