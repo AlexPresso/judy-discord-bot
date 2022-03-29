@@ -1,7 +1,10 @@
 {
-  "token": "",
+  "bot": {
+    "token": "",
+    "prefix": "!",
+    "status": "!"
+  },
   "owner": "",
-  "prefix": "!",
   "cmdChannel": "123456789",
   "createVoiceChannels": {
     "123456789": "123456789"
