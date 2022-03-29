@@ -66,9 +66,19 @@ func voiceLeft(s *discordgo.Session, oldState *discordgo.VoiceState) {
 		return
 	}
 
-	if channel.Type == discordgo.ChannelTypeGuildVoice && channel.MemberCount == 0 {
-		if _, err = s.ChannelDelete(oldState.ChannelID); err != nil {
-			utils.Error("Error deleting channel: " + err.Error())
+	parentId := viper.GetString(fmt.Sprintf("createVoiceChannels.%s", channel.ID))
+
+	if channel.Type == discordgo.ChannelTypeGuildVoice && parentId == "" {
+		guild, err := s.State.Guild(oldState.GuildID)
+		if err != nil {
+			utils.Error("Error fetching guild: " + err.Error())
+			return
+		}
+
+		if userCount := getVoiceUserCount(guild, channel.ID); userCount == 0 {
+			if _, err = s.ChannelDelete(oldState.ChannelID); err != nil {
+				utils.Error("Error deleting channel: " + err.Error())
+			}
 		}
 	}
 }
@@ -76,4 +86,16 @@ func voiceLeft(s *discordgo.Session, oldState *discordgo.VoiceState) {
 func voiceChannelChanged(s *discordgo.Session, oldState *discordgo.VoiceState, newState *discordgo.VoiceState) {
 	voiceLeft(s, oldState)
 	voiceJoined(s, newState)
+}
+
+func getVoiceUserCount(guild *discordgo.Guild, channel string) int {
+	count := 0
+
+	for _, state := range guild.VoiceStates {
+		if state.ChannelID == channel {
+			count++
+		}
+	}
+
+	return count
 }
