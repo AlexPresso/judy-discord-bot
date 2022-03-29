@@ -7,7 +7,7 @@ import (
 )
 
 func Ready(s *discordgo.Session, _ *discordgo.Ready) {
-	utils.Info("Connected.")
+	utils.Info("Bot ready.")
 
 	if err := s.UpdateListeningStatus(viper.GetString("bot.status")); err != nil {
 		utils.Error("Cannot update status" + err.Error())
