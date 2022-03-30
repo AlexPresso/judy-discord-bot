@@ -2,6 +2,7 @@ package bootstrap
 
 import (
 	H "github.com/alexpresso/judy/handlers"
+	"github.com/alexpresso/judy/structures"
 	"github.com/alexpresso/judy/utils"
 	"github.com/bwmarrin/discordgo"
 	"github.com/spf13/viper"
@@ -15,6 +16,8 @@ func InitializeBot() (sess *discordgo.Session) {
 		log.Fatal(err)
 	}
 
+	state := structures.NewBotState()
+
 	sess.Identify.Intents = discordgo.IntentsGuilds |
 		discordgo.IntentsGuildVoiceStates |
 		discordgo.IntentsGuildMembers |
@@ -23,7 +26,7 @@ func InitializeBot() (sess *discordgo.Session) {
 	sess.AddHandler(H.Connect)
 	sess.AddHandler(H.Ready)
 	sess.AddHandler(H.Disconnect)
-	sess.AddHandler(H.VoiceStateUpdate)
+	sess.AddHandler(H.VoiceStateUpdate(state))
 
 	err = sess.Open()
 	if err != nil {

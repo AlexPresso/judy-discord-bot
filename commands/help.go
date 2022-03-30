@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"fmt"
 	"github.com/alexpresso/judy/utils"
 	"github.com/bwmarrin/discordgo"
 	"github.com/lus/dgc"
@@ -14,13 +15,12 @@ var Help = dgc.Command{
 	Example:     "help",
 	IgnoreCase:  true,
 	Handler: func(ctx *dgc.Ctx) {
-		var commands = ""
-		var descriptions = ""
+		commands, descriptions := "", ""
 		prefix := viper.GetString("bot.prefix")
 
 		for _, cmd := range ctx.Router.Commands {
 			if utils.CanRunCommand(cmd.Flags, ctx.Event.Member, ctx.Event.Author.ID) {
-				commands += "`" + prefix + cmd.Usage + "`\n"
+				commands += fmt.Sprintf("`%s%s`\n", prefix, cmd.Usage)
 				descriptions += cmd.Description + "\n"
 			}
 		}
