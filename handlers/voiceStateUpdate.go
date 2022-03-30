@@ -2,29 +2,32 @@ package handlers
 
 import (
 	"fmt"
+	"github.com/alexpresso/judy/structures"
 	"github.com/alexpresso/judy/utils"
 	"github.com/bwmarrin/discordgo"
 	"github.com/spf13/viper"
 )
 
-func VoiceStateUpdate(s *discordgo.Session, update *discordgo.VoiceStateUpdate) {
-	go func() {
-		oldState := update.BeforeUpdate
-		newState := update.VoiceState
+func VoiceStateUpdate(botState *structures.BotState) func(s *discordgo.Session, update *discordgo.VoiceStateUpdate) {
+	return func(s *discordgo.Session, update *discordgo.VoiceStateUpdate) {
+		go func() {
+			oldState := update.BeforeUpdate
+			newState := update.VoiceState
 
-		if oldState != newState {
-			if oldState == nil {
-				voiceJoined(s, newState)
-			} else if newState.ChannelID == "" {
-				voiceLeft(s, oldState)
-			} else {
-				voiceChannelChanged(s, oldState, newState)
+			if oldState != newState {
+				if oldState == nil {
+					voiceJoined(s, newState, botState)
+				} else if newState.ChannelID == "" {
+					voiceLeft(s, oldState, botState)
+				} else {
+					voiceChannelChanged(s, oldState, newState, botState)
+				}
 			}
-		}
-	}()
+		}()
+	}
 }
 
-func voiceJoined(s *discordgo.Session, newState *discordgo.VoiceState) {
+func voiceJoined(s *discordgo.Session, newState *discordgo.VoiceState, botState *structures.BotState) {
 	parentId := viper.GetString(fmt.Sprintf("createVoiceChannels.%s", newState.ChannelID))
 	if parentId == "" {
 		return
@@ -54,12 +57,14 @@ func voiceJoined(s *discordgo.Session, newState *discordgo.VoiceState) {
 		return
 	}
 
+	botState.TempVoiceChannels[channel.ID] = ""
+
 	if err = s.GuildMemberMove(newState.GuildID, newState.UserID, &channel.ID); err != nil {
 		utils.Error("Error while moving member: " + err.Error())
 	}
 }
 
-func voiceLeft(s *discordgo.Session, oldState *discordgo.VoiceState) {
+func voiceLeft(s *discordgo.Session, oldState *discordgo.VoiceState, botState *structures.BotState) {
 	channel, err := s.Channel(oldState.ChannelID)
 	if err != nil {
 		utils.Error("Error fetching channel: " + err.Error())
@@ -75,17 +80,19 @@ func voiceLeft(s *discordgo.Session, oldState *discordgo.VoiceState) {
 			return
 		}
 
-		if userCount := getVoiceUserCount(guild, channel.ID); userCount == 0 {
-			if _, err = s.ChannelDelete(oldState.ChannelID); err != nil {
+		if userCount := getVoiceUserCount(guild, channel.ID); userCount == 0 && botState.TempVoiceChannels[channel.ID] != nil {
+			if _, err = s.ChannelDelete(oldState.ChannelID); err == nil {
+				delete(botState.TempVoiceChannels, channel.ID)
+			} else {
 				utils.Error("Error deleting channel: " + err.Error())
 			}
 		}
 	}
 }
 
-func voiceChannelChanged(s *discordgo.Session, oldState *discordgo.VoiceState, newState *discordgo.VoiceState) {
-	voiceLeft(s, oldState)
-	voiceJoined(s, newState)
+func voiceChannelChanged(s *discordgo.Session, oldState *discordgo.VoiceState, newState *discordgo.VoiceState, botState *structures.BotState) {
+	voiceLeft(s, oldState, botState)
+	voiceJoined(s, newState, botState)
 }
 
 func getVoiceUserCount(guild *discordgo.Guild, channel string) (count int) {
