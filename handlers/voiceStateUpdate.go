@@ -45,6 +45,7 @@ func voiceJoined(s *discordgo.Session, newState *discordgo.VoiceState, botState 
 		permissions = append(permissions, parent.PermissionOverwrites...)
 	} else {
 		utils.Error("Error while fetching category: " + err.Error())
+		return
 	}
 
 	user, err := s.User(newState.UserID)
