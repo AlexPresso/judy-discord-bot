@@ -33,6 +33,20 @@ func voiceJoined(s *discordgo.Session, newState *discordgo.VoiceState, botState 
 		return
 	}
 
+	permissions := []*discordgo.PermissionOverwrite{
+		{
+			Type:  discordgo.PermissionOverwriteTypeMember,
+			ID:    newState.UserID,
+			Allow: discordgo.PermissionManageChannels,
+		},
+	}
+
+	if parent, err := s.Channel(parentId); err == nil {
+		permissions = append(permissions, parent.PermissionOverwrites...)
+	} else {
+		utils.Error("Error while fetching category: " + err.Error())
+	}
+
 	user, err := s.User(newState.UserID)
 	if err != nil {
 		utils.Error("Error while fetching user: " + err.Error())
@@ -40,16 +54,10 @@ func voiceJoined(s *discordgo.Session, newState *discordgo.VoiceState, botState 
 	}
 
 	channel, err := s.GuildChannelCreateComplex(newState.GuildID, discordgo.GuildChannelCreateData{
-		Name:     "🔊 " + user.Username,
-		Type:     discordgo.ChannelTypeGuildVoice,
-		ParentID: parentId,
-		PermissionOverwrites: []*discordgo.PermissionOverwrite{
-			{
-				Type:  discordgo.PermissionOverwriteTypeMember,
-				ID:    newState.UserID,
-				Allow: discordgo.PermissionManageChannels,
-			},
-		},
+		Name:                 "🔊 " + user.Username,
+		Type:                 discordgo.ChannelTypeGuildVoice,
+		ParentID:             parentId,
+		PermissionOverwrites: permissions,
 	})
 
 	if err != nil {
