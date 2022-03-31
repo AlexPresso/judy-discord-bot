@@ -11,9 +11,7 @@ import (
 
 func init() {
 	viper.SetConfigFile("config.json")
-	err := viper.ReadInConfig()
-
-	if err != nil {
+	if err := viper.ReadInConfig(); err != nil {
 		log.Fatal(err)
 	}
 }

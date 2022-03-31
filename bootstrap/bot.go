@@ -28,8 +28,7 @@ func InitializeBot() (sess *discordgo.Session) {
 	sess.AddHandler(H.Disconnect)
 	sess.AddHandler(H.VoiceStateUpdate(state))
 
-	err = sess.Open()
-	if err != nil {
+	if err = sess.Open(); err != nil {
 		log.Fatal(err)
 	}
 
