@@ -19,9 +19,7 @@ func InitializeBot() (sess *discordgo.Session) {
 	state := structures.NewBotState()
 
 	sess.Identify.Intents = discordgo.IntentsGuilds |
-		discordgo.IntentsGuildVoiceStates |
-		discordgo.IntentsGuildMembers |
-		discordgo.IntentsGuildMessages
+		discordgo.IntentsGuildVoiceStates
 
 	sess.AddHandler(H.Connect)
 	sess.AddHandler(H.Ready)
