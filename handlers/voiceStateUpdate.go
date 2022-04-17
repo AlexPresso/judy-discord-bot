@@ -31,6 +31,8 @@ func voiceJoined(s *discordgo.Session, newState *discordgo.VoiceState, botState 
 	parentId := viper.GetString(fmt.Sprintf("createVoiceChannels.%s", newState.ChannelID))
 	if parentId == "" {
 		return
+	} else if _, exists := botState.VoiceChannelCount[parentId]; !exists {
+		botState.VoiceChannelCount[parentId] = 0
 	}
 
 	permissions := []*discordgo.PermissionOverwrite{
@@ -48,14 +50,8 @@ func voiceJoined(s *discordgo.Session, newState *discordgo.VoiceState, botState 
 		return
 	}
 
-	user, err := s.User(newState.UserID)
-	if err != nil {
-		utils.Error("Error while fetching user: " + err.Error())
-		return
-	}
-
 	channel, err := s.GuildChannelCreateComplex(newState.GuildID, discordgo.GuildChannelCreateData{
-		Name:                 "🔊 " + user.Username,
+		Name:                 fmt.Sprintf("🔊 Vocal N°%d", botState.VoiceChannelCount[parentId]+1),
 		Type:                 discordgo.ChannelTypeGuildVoice,
 		ParentID:             parentId,
 		PermissionOverwrites: permissions,
@@ -66,7 +62,8 @@ func voiceJoined(s *discordgo.Session, newState *discordgo.VoiceState, botState 
 		return
 	}
 
-	botState.TempVoiceChannels[channel.ID] = ""
+	botState.TempVoiceChannels[channel.ID] = parentId
+	botState.VoiceChannelCount[parentId]++
 
 	if err = s.GuildMemberMove(newState.GuildID, newState.UserID, &channel.ID); err != nil {
 		utils.Error("Error while moving member: " + err.Error())
@@ -74,27 +71,33 @@ func voiceJoined(s *discordgo.Session, newState *discordgo.VoiceState, botState 
 }
 
 func voiceLeft(s *discordgo.Session, oldState *discordgo.VoiceState, botState *structures.BotState) {
+	if _, exists := botState.TempVoiceChannels[oldState.ChannelID]; !exists {
+		return
+	}
+
 	channel, err := s.Channel(oldState.ChannelID)
 	if err != nil {
 		utils.Error("Error fetching channel: " + err.Error())
 		return
 	}
 
-	parentId := viper.GetString(fmt.Sprintf("createVoiceChannels.%s", channel.ID))
+	parentId := botState.TempVoiceChannels[channel.ID]
+	if _, exists := botState.VoiceChannelCount[parentId]; !exists {
+		botState.VoiceChannelCount[parentId] = 1
+	}
 
-	if channel.Type == discordgo.ChannelTypeGuildVoice && parentId == "" {
-		guild, err := s.State.Guild(oldState.GuildID)
-		if err != nil {
-			utils.Error("Error fetching guild: " + err.Error())
-			return
-		}
+	guild, err := s.State.Guild(oldState.GuildID)
+	if err != nil {
+		utils.Error("Error fetching guild: " + err.Error())
+		return
+	}
 
-		if userCount := getVoiceUserCount(guild, channel.ID); userCount == 0 && botState.TempVoiceChannels[channel.ID] != nil {
-			if _, err = s.ChannelDelete(oldState.ChannelID); err == nil {
-				delete(botState.TempVoiceChannels, channel.ID)
-			} else {
-				utils.Error("Error deleting channel: " + err.Error())
-			}
+	if userCount := getVoiceUserCount(guild, channel.ID); userCount == 0 {
+		if _, err = s.ChannelDelete(oldState.ChannelID); err == nil {
+			delete(botState.TempVoiceChannels, channel.ID)
+			botState.VoiceChannelCount[parentId]--
+		} else {
+			utils.Error("Error deleting channel: " + err.Error())
 		}
 	}
 }
