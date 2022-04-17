@@ -1,11 +1,13 @@
 package structures
 
 type BotState struct {
-	TempVoiceChannels map[string]interface{}
+	VoiceChannelCount map[string]uint8
+	TempVoiceChannels map[string]string
 }
 
 func NewBotState() *BotState {
 	return &BotState{
-		TempVoiceChannels: make(map[string]interface{}),
+		VoiceChannelCount: make(map[string]uint8),
+		TempVoiceChannels: make(map[string]string),
 	}
 }
