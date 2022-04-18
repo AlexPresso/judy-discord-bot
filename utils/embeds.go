@@ -4,11 +4,18 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/lus/dgc"
 	"github.com/spf13/viper"
+	"time"
+)
+
+const (
+	ColorDefault = 0x5352ed
+	ColorRed     = 0xFF0000
+	ColorGreen   = 0xFF0000
 )
 
 func DefaultEmbed() *discordgo.MessageEmbed {
 	return &discordgo.MessageEmbed{
-		Color: 0x5352ed,
+		Color: ColorDefault,
 	}
 }
 
@@ -21,18 +28,28 @@ func MessageEmbed(message string) (embed *discordgo.MessageEmbed) {
 func MessageWithTitleEmbed(title string, message string) (embed *discordgo.MessageEmbed) {
 	embed = MessageEmbed(message)
 	embed.Title = title
+	embed.Timestamp = time.Now().Format(time.RFC3339)
+	return
+}
+
+func MessageWithTitleAndAuthor(title string, message string, user *discordgo.User) (embed *discordgo.MessageEmbed) {
+	embed = MessageWithTitleEmbed(title, message)
+	embed.Footer = &discordgo.MessageEmbedFooter{
+		IconURL: user.AvatarURL("32"),
+		Text:    user.Username,
+	}
 	return
 }
 
 func SuccessEmbed(message string) (embed *discordgo.MessageEmbed) {
 	embed = MessageEmbed(message)
-	embed.Color = 0x7bed9f
+	embed.Color = ColorGreen
 	return
 }
 
 func ErrorEmbed(message string) (embed *discordgo.MessageEmbed) {
 	embed = MessageEmbed(message)
-	embed.Color = 0xFF0000
+	embed.Color = ColorRed
 	return
 }
 

@@ -18,12 +18,20 @@ func InitializeBot() (sess *discordgo.Session) {
 
 	state := structures.NewBotState()
 
+	sess.State.MaxMessageCount = viper.GetInt("bot.cachedMessagesCount")
 	sess.Identify.Intents = discordgo.IntentsGuilds |
-		discordgo.IntentsGuildVoiceStates
+		discordgo.IntentsGuildVoiceStates |
+		discordgo.IntentsGuildMessages |
+		discordgo.IntentsMessageContent |
+		discordgo.IntentsGuildMembers
 
 	sess.AddHandler(H.Connect)
 	sess.AddHandler(H.Ready)
 	sess.AddHandler(H.Disconnect)
+	sess.AddHandler(H.MessageUpdate)
+	sess.AddHandler(H.MessageDelete)
+	sess.AddHandler(H.GuildMemberAdd)
+	sess.AddHandler(H.GuildMemberRemove)
 	sess.AddHandler(H.VoiceStateUpdate(state))
 
 	if err = sess.Open(); err != nil {
