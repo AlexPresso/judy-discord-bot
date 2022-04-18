@@ -2,10 +2,12 @@
   "bot": {
     "token": "",
     "prefix": "!",
-    "status": "!"
+    "status": "!",
+    "cachedMessagesCount": 10000
   },
   "owner": "",
   "cmdChannel": "123456789",
+  "modChannel": "123456789",
   "createVoiceChannels": {
     "123456789": "123456789"
   }
