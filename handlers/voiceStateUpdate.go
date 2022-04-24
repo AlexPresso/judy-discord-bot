@@ -29,10 +29,13 @@ func VoiceStateUpdate(botState *structures.BotState) func(s *discordgo.Session, 
 
 func voiceJoined(s *discordgo.Session, newState *discordgo.VoiceState, botState *structures.BotState) {
 	parentId := viper.GetString(fmt.Sprintf("createVoiceChannels.%s", newState.ChannelID))
+	number := 1
 	if parentId == "" {
 		return
 	} else if _, exists := botState.VoiceChannelCount[parentId]; !exists {
-		botState.VoiceChannelCount[parentId] = 0
+		botState.VoiceChannelCount[parentId] = make(map[int]interface{})
+	} else {
+		number = getAvailableNumber(botState.VoiceChannelCount[parentId])
 	}
 
 	permissions := []*discordgo.PermissionOverwrite{
@@ -51,7 +54,7 @@ func voiceJoined(s *discordgo.Session, newState *discordgo.VoiceState, botState 
 	}
 
 	channel, err := s.GuildChannelCreateComplex(newState.GuildID, discordgo.GuildChannelCreateData{
-		Name:                 fmt.Sprintf("🔊 Vocal N°%d", botState.VoiceChannelCount[parentId]+1),
+		Name:                 fmt.Sprintf("🔊 Vocal N°%d", number),
 		Type:                 discordgo.ChannelTypeGuildVoice,
 		ParentID:             parentId,
 		PermissionOverwrites: permissions,
@@ -62,8 +65,13 @@ func voiceJoined(s *discordgo.Session, newState *discordgo.VoiceState, botState 
 		return
 	}
 
-	botState.TempVoiceChannels[channel.ID] = parentId
-	botState.VoiceChannelCount[parentId]++
+	tempChannel := &structures.TempChannel{
+		ParentId: parentId,
+		Number:   number,
+	}
+
+	botState.VoiceChannelCount[parentId][number] = nil
+	botState.TempVoiceChannels[channel.ID] = tempChannel
 
 	if err = s.GuildMemberMove(newState.GuildID, newState.UserID, &channel.ID); err != nil {
 		utils.Error("Error while moving member: " + err.Error())
@@ -81,9 +89,9 @@ func voiceLeft(s *discordgo.Session, oldState *discordgo.VoiceState, botState *s
 		return
 	}
 
-	parentId := botState.TempVoiceChannels[channel.ID]
-	if _, exists := botState.VoiceChannelCount[parentId]; !exists {
-		botState.VoiceChannelCount[parentId] = 1
+	tempChannel := botState.TempVoiceChannels[channel.ID]
+	if _, exists := botState.VoiceChannelCount[tempChannel.ParentId]; !exists {
+		botState.VoiceChannelCount[tempChannel.ParentId] = make(map[int]interface{})
 	}
 
 	guild, err := s.State.Guild(oldState.GuildID)
@@ -94,8 +102,8 @@ func voiceLeft(s *discordgo.Session, oldState *discordgo.VoiceState, botState *s
 
 	if userCount := getVoiceUserCount(guild, channel.ID); userCount == 0 {
 		if _, err = s.ChannelDelete(oldState.ChannelID); err == nil {
+			delete(botState.VoiceChannelCount[tempChannel.ParentId], tempChannel.Number)
 			delete(botState.TempVoiceChannels, channel.ID)
-			botState.VoiceChannelCount[parentId]--
 		} else {
 			utils.Error("Error deleting channel: " + err.Error())
 		}
@@ -117,4 +125,14 @@ func getVoiceUserCount(guild *discordgo.Guild, channel string) (count int) {
 	}
 
 	return
+}
+
+func getAvailableNumber(numbers map[int]interface{}) int {
+	for i := 1; i < 255; i++ {
+		if _, exists := numbers[i]; !exists {
+			return i
+		}
+	}
+
+	return 0
 }

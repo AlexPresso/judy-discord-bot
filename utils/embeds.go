@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"github.com/lus/dgc"
 	"github.com/spf13/viper"
@@ -10,7 +11,7 @@ import (
 const (
 	ColorDefault = 0x5352ed
 	ColorRed     = 0xFF0000
-	ColorGreen   = 0xFF0000
+	ColorGreen   = 0x7bed9f
 )
 
 func DefaultEmbed() *discordgo.MessageEmbed {
@@ -64,12 +65,12 @@ func CommandErrorPage(cmd *dgc.Command) (embed *discordgo.MessageEmbed) {
 		},
 		{
 			Name:   "Usage",
-			Value:  "`" + cmd.Usage + "`",
+			Value:  fmt.Sprintf("`%s`", cmd.Usage),
 			Inline: true,
 		},
 		{
 			Name:   "Exemple",
-			Value:  "`" + cmd.Example + "`",
+			Value:  fmt.Sprintf("`%s`", cmd.Example),
 			Inline: true,
 		},
 	}

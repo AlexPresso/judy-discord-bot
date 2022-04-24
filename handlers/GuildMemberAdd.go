@@ -9,7 +9,7 @@ import (
 func GuildMemberAdd(s *discordgo.Session, member *discordgo.GuildMemberAdd) {
 	go func() {
 		embed := utils.MessageWithTitleAndAuthor("", fmt.Sprintf("%s a rejoint le serveur.", member.Mention()), member.User)
-		embed.Color = utils.ColorRed
+		embed.Color = utils.ColorGreen
 
 		utils.SendModMessage(s, &discordgo.MessageSend{
 			Embed: embed,
