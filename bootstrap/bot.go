@@ -20,10 +20,10 @@ func InitializeBot() (sess *discordgo.Session) {
 
 	sess.State.MaxMessageCount = viper.GetInt("bot.cachedMessagesCount")
 	sess.Identify.Intents = discordgo.IntentsGuilds |
-		discordgo.IntentsGuildVoiceStates
-	//discordgo.IntentsGuildMessages |
-	//discordgo.IntentsMessageContent |
-	//discordgo.IntentsGuildMembers
+		discordgo.IntentsGuildVoiceStates |
+		discordgo.IntentsGuildMessages |
+		discordgo.IntentsMessageContent |
+		discordgo.IntentsGuildMembers
 
 	sess.AddHandler(H.Connect)
 	sess.AddHandler(H.Ready)
