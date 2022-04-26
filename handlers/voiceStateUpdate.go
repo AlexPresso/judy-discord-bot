@@ -29,15 +29,13 @@ func VoiceStateUpdate(botState *structures.BotState) func(s *discordgo.Session, 
 
 func voiceJoined(s *discordgo.Session, newState *discordgo.VoiceState, botState *structures.BotState) {
 	parentId := viper.GetString(fmt.Sprintf("createVoiceChannels.%s", newState.ChannelID))
-	number := 1
 	if parentId == "" {
 		return
 	} else if _, exists := botState.VoiceChannelCount[parentId]; !exists {
 		botState.VoiceChannelCount[parentId] = make(map[int]interface{})
-	} else {
-		number = getAvailableNumber(botState.VoiceChannelCount[parentId])
 	}
 
+	number := getAvailableNumber(botState.VoiceChannelCount[parentId])
 	permissions := []*discordgo.PermissionOverwrite{
 		{
 			Type:  discordgo.PermissionOverwriteTypeMember,
