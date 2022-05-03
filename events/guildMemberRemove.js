@@ -3,7 +3,7 @@ const EmbedUtils = require("../utils/EmbedUtils");
 module.exports = async (client, member) => {
     const embed = EmbedUtils.messageWithTitleAndAuthor(
         "",
-        `${member} a quitté le serveur.`,
+        `${member} a quitté le serveur (${member.guild.memberCount} membres).`,
         member
     ).setColor(EmbedUtils.colorRed);
 
