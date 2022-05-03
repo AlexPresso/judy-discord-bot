@@ -1,5 +1,7 @@
 {
   "bot": {
+    "guildId": "",
+    "clientId": "",
     "token": ""
   },
   "modChannel": "123456789",
