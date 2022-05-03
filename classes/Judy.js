@@ -57,6 +57,9 @@ module.exports = class Judy {
             const command = require(`../commands/${file}`),
                 name = file.split('.')[0];
 
+            if(!command.enabled)
+                return;
+
             this._client._commands.set(name, command.handleInteraction);
             commandsData.push(command.init(new SlashCommandBuilder().setName(name)).toJSON());
         });
