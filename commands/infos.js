@@ -9,7 +9,7 @@ module.exports = {
         const embed = EmbedUtils.defaultEmbed()
             .setThumbnail(client.user.avatarURL())
             .setTitle("Infos")
-            .setDescription(`${client.user.username} a été développée par <@168436075058954240> en utilisant la librairie [DiscordGo](https://github.com/bwmarrin/discordgo)`)
+            .setDescription(`${client.user.username} a été développée par <@168436075058954240> en utilisant la librairie [Discord.js](https://discord.js.org)`)
 
         interaction.reply({embeds: [embed]});
     }
