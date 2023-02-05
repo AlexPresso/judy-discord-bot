@@ -1,4 +1,4 @@
-const { MessageEmbed, GuildMember} = require('discord.js');
+const { EmbedBuilder, GuildMember} = require('discord.js');
 
 
 module.exports = class EmbedUtils {
@@ -7,7 +7,7 @@ module.exports = class EmbedUtils {
     static colorGreen = 0x7bed9f;
 
     static defaultEmbed() {
-        return new MessageEmbed().setColor(EmbedUtils.colorDefault);
+        return new EmbedBuilder().setColor(EmbedUtils.colorDefault);
     }
 
     static messageEmbed(message) {

@@ -1,6 +1,6 @@
 module.exports = {
     enabled: false,
-    init: (builder) => {
+    init: (builder, _) => {
         return builder.setDescription('Affiche la liste des commandes.');
     },
     handleInteraction: (client, interaction) => {
