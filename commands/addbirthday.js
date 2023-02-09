@@ -20,19 +20,21 @@ module.exports = {
                 EmbedUtils.errorEmbed(`\`${day}-${month}\` est un jour-mois incorrect.`)
             ]});
 
-        let entries = client.config.birthdays.dates[`${month}-${day}`] || [];
+        let replaced = false;
+        for(const [date, userIds] of Object.entries(client.config.birthdays.dates)) {
+            if(userIds.includes(user.id)) {
+                client.config.birthdays.dates[date] = userIds.filter(id => id !== user.id);
+                replaced = true;
+                break;
+            }
+        }
 
-        if(entries.includes(user.id))
-            return interaction.reply({embeds: [
-                EmbedUtils.errorEmbed(`L'anniversaire de ${user} est déjà enregistré.`)
-            ]});
-
-        entries = [user.id, ...entries];
-        client.config.birthdays.dates[`${month}-${day}`] = entries;
+        const previous = client.config.birthdays.dates[`${month}-${day}`] || [];
+        client.config.birthdays.dates[`${month}-${day}`] = [user.id, ...previous];
         await client.saveConfig();
 
         interaction.reply({embeds: [
-            EmbedUtils.successEmbed(`L'anniversaire de ${user} a été ajouté au \`${day}-${month}\``)
+            EmbedUtils.successEmbed(`L'anniversaire de ${user} a été ${replaced ? "déplacé" : "ajouté" } au \`${day}-${month}\``)
         ]});
     }
 }
