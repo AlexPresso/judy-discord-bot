@@ -1,7 +1,8 @@
-const { Client, Intents} = require('discord.js');
+const { Client, IntentsBitField, PermissionFlagsBits} = require('discord.js');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const schedule = require('node-schedule');
 const fs = require('fs');
 const Config = require('../config.json');
 const Logger = require('./Logger');
@@ -10,17 +11,18 @@ module.exports = class Judy {
     constructor() {
         this._client = new Client({
             intents: [
-                Intents.FLAGS.GUILDS,
-                Intents.FLAGS.GUILD_VOICE_STATES,
-                Intents.FLAGS.GUILD_MESSAGES,
-                Intents.FLAGS.GUILD_MEMBERS,
-                Intents.FLAGS.GUILD_INTEGRATIONS
+                IntentsBitField.Flags.Guilds,
+                IntentsBitField.Flags.GuildVoiceStates,
+                IntentsBitField.Flags.GuildMessages,
+                IntentsBitField.Flags.GuildMembers,
+                IntentsBitField.Flags.GuildIntegrations
             ]
         });
     }
 
     async bootstrap() {
         this._client.config = Config;
+        this._client.saveConfig = this.saveConfig;
         this._client.logger = new Logger();
         this._client._commands = new Map();
         this._client._state = {
@@ -36,6 +38,9 @@ module.exports = class Judy {
 
         this._client.logger.info("Logging in...");
         await this._client.login(Config.bot.token);
+
+        this._client.logger.info("Loading scheduled tasks...");
+        this.scheduleTasks();
     }
 
     registerEvents() {
@@ -46,6 +51,24 @@ module.exports = class Judy {
             this._client.on(name, event.bind(null, this._client));
             this._client.logger.debug(`Loaded ${name} event.`);
             delete require.cache[require.resolve(`../events/${file}`)];
+        });
+    }
+
+    scheduleTasks() {
+        fs.readdirSync('./scheduled').forEach(file => {
+            const scheduledTask = require(`../scheduled/${file}`),
+                name = file.split('.')[0];
+
+            schedule.scheduleJob(scheduledTask.schedule, scheduledTask.task.bind(null, this._client));
+            this._client.logger.debug(`Loaded ${name} scheduled task.`);
+            delete require.cache[require.resolve(`../scheduled/${file}`)];
+        });
+    }
+
+    async saveConfig() {
+        fs.writeFile('./config.json', JSON.stringify(this.config, null, 4), (err) => {
+            if(err)
+                console.error(err);
         });
     }
 
@@ -61,7 +84,7 @@ module.exports = class Judy {
                 return;
 
             this._client._commands.set(name, command.handleInteraction);
-            commandsData.push(command.init(new SlashCommandBuilder().setName(name)).toJSON());
+            commandsData.push(command.init(new SlashCommandBuilder().setName(name), PermissionFlagsBits).toJSON());
         });
 
         this._client.logger.debug(`Refreshing commands: ${Array.from(this._client._commands.keys()).join(', ')}`);
