@@ -80,7 +80,7 @@ module.exports = class Judy {
             const command = require(`../commands/${file}`),
                 name = file.split('.')[0];
 
-            if(!command.enabled)
+            if(!this._client.config.commands.includes(name))
                 return;
 
             this._client._commands.set(name, command.handleInteraction);
