@@ -1,7 +1,6 @@
 const EmbedUtils = require('../utils/EmbedUtils');
 
 module.exports = {
-    enabled: true,
     init: (builder, _) => {
         return builder.setDescription('Affiche les informations du bot.');
     },
