@@ -19,5 +19,9 @@
       "title": "Happy birthday !",
       "message": "Everyone wishes a happy birthday to <@%userId%> !"
     }
-  }
+  },
+  "commands": [
+    "addbirthday",
+    "infos"
+  ]
 }

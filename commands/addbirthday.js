@@ -1,7 +1,6 @@
 const EmbedUtils = require('../utils/EmbedUtils');
 
 module.exports = {
-    enabled: true,
     init: (builder, permissions) => {
         return builder.setDescription('Ajouter un anniversaire.')
             .addUserOption(o => o.setName('utilisateur').setDescription('utilisateur').setRequired(true))
