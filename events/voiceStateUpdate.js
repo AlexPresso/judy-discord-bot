@@ -1,4 +1,4 @@
-const { Permissions } = require("discord.js");
+const { PermissionFlagsBits } = require("discord.js");
 
 module.exports = async (client, oldState, newState) => {
     if(oldState.channelId === newState.channelId)
@@ -26,7 +26,7 @@ async function voiceJoined(client, newState) {
         permissionOverwrites: [
             {
                 id: newState.id,
-                allow: [ Permissions.FLAGS.MANAGE_CHANNELS ]
+                allow: [ PermissionFlagsBits.ManageChannels ]
             },
             ...newState.channel.parent.permissionOverwrites.cache.values()
         ]
