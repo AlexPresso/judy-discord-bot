@@ -73,7 +73,7 @@ module.exports = class Judy {
     }
 
     async registerCommands() {
-        const rest = new REST({version: '9'}).setToken(Config.bot.token);
+        const rest = new REST({version: '10'}).setToken(Config.bot.token);
         const commandsData = [];
 
         fs.readdirSync('./commands').forEach(file => {
