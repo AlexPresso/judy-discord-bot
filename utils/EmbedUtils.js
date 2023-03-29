@@ -30,6 +30,16 @@ module.exports = class EmbedUtils {
         });
     }
 
+    static messageWithAuthor(message, user) {
+        if(user instanceof GuildMember)
+            user = user.user;
+
+        return EmbedUtils.messageEmbed(message).setFooter({
+            text: user.username,
+            iconURL: user.avatarURL()
+        });
+    }
+
     static successEmbed(message) {
         return EmbedUtils.messageEmbed(message).setColor(EmbedUtils.colorGreen);
     }

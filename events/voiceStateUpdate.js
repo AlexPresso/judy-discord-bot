@@ -1,4 +1,4 @@
-const { PermissionFlagsBits } = require("discord.js");
+const { PermissionFlagsBits, ChannelType } = require("discord.js");
 
 module.exports = async (client, oldState, newState) => {
     if(oldState.channelId === newState.channelId)
@@ -20,9 +20,10 @@ async function voiceJoined(client, newState) {
         return;
 
     const number = getAvailableNumber(client._state.tempChannelsCounters, parentId);
-    const channel = await newState.guild.channels.create(`🔊 Vocal N°${number}`, {
+    const channel = await newState.guild.channels.create({
+        name: `🔊 Vocal N°${number}`,
         parent: parentId,
-        type: 'GUILD_VOICE',
+        type: ChannelType.GuildVoice,
         permissionOverwrites: [
             {
                 id: newState.id,

@@ -1,8 +1,7 @@
 const EmbedUtils = require('../utils/EmbedUtils');
 
 module.exports = async (client, member) => {
-    const embed = EmbedUtils.messageWithTitleAndAuthor(
-        "",
+    const embed = EmbedUtils.messageWithAuthor(
         `${member} a rejoint le serveur (${member.guild.memberCount} membres).`,
         member
     ).setColor(EmbedUtils.colorGreen);
