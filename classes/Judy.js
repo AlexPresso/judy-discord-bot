@@ -27,7 +27,8 @@ module.exports = class Judy {
         this._client._commands = new Map();
         this._client._state = {
             tempChannels: new Map(),
-            tempChannelsCounters: new Map()
+            tempChannelsCounters: new Map(),
+            twitchPrevState: null
         }
 
         this._client.logger.info("Loading events...");
