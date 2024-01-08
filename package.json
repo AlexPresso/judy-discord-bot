@@ -7,15 +7,16 @@
     "start": "node app.js"
   },
   "dependencies": {
-    "@discordjs/builders": "^1.4.0",
-    "@discordjs/rest": "^1.5.0",
-    "bufferutil": "^4.0.6",
+    "@discordjs/builders": "^1.7.0",
+    "@discordjs/rest": "^2.2.0",
+    "axios": "^1.6.5",
+    "bufferutil": "^4.0.8",
     "colors": "^1.4.0",
-    "discord-api-types": "^0.37.31",
-    "discord.js": "^14.7.1",
+    "discord-api-types": "^0.37.67",
+    "discord.js": "^14.14.1",
     "erlpack": "^0.1.4",
     "node-schedule": "^2.1.1",
     "utf-8-validate": "^6.0.2",
-    "zlib-sync": "^0.1.7"
+    "zlib-sync": "^0.1.9"
   }
 }

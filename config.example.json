@@ -20,6 +20,12 @@
       "message": "Everyone wishes a happy birthday to <@%userId%> !"
     }
   },
+  "twitch": {
+    "message": "%userName% is live!",
+    "channel": "YourChannel",
+    "clientId": "",
+    "clientSecret": ""
+  },
   "commands": [
     "addbirthday",
     "infos"
