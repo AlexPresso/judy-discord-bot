@@ -28,7 +28,10 @@ module.exports = class Judy {
         this._client._state = {
             tempChannels: new Map(),
             tempChannelsCounters: new Map(),
-            twitchPrevState: null
+            twitch: {
+                prevState: null,
+                scheduledEvent: null
+            }
         }
 
         this._client.logger.info("Loading events...");
@@ -60,7 +63,14 @@ module.exports = class Judy {
             const scheduledTask = require(`../scheduled/${file}`),
                 name = file.split('.')[0];
 
-            schedule.scheduleJob(scheduledTask.schedule, scheduledTask.task.bind(null, this._client));
+            schedule.scheduleJob(scheduledTask.schedule, () => {
+                try {
+                    scheduledTask.task.bind(null, this._client);
+                } catch (e) {
+                    console.error(e);
+                }
+            });
+
             this._client.logger.debug(`Loaded ${name} scheduled task.`);
             delete require.cache[require.resolve(`../scheduled/${file}`)];
         });
