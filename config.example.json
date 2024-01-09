@@ -23,6 +23,7 @@
   "twitch": {
     "message": "%userName% is live!",
     "channel": "YourChannel",
+    "discordChannel": "123456789",
     "clientId": "",
     "clientSecret": ""
   },
