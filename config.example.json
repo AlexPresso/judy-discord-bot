@@ -1,5 +1,6 @@
 {
   "bot": {
+    "ownerId": "",
     "guildId": "",
     "clientId": "",
     "token": ""

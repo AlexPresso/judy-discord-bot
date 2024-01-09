@@ -65,7 +65,7 @@ module.exports = class Judy {
 
             schedule.scheduleJob(scheduledTask.schedule, () => {
                 try {
-                    scheduledTask.task.bind(null, this._client);
+                    scheduledTask.task(this._client);
                 } catch (e) {
                     console.error(e);
                 }
