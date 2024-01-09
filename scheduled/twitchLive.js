@@ -57,7 +57,7 @@ async function startOrEditLiveEvent(client, state, manager, previousEvent) {
         }
     };
 
-    client._state.twitch.scheduledEvent = await previousEvent ?
+    client._state.twitch.scheduledEvent = previousEvent ?
         manager.edit(previousEvent, options) :
         manager.create({
             scheduledStartTime: date.setSeconds(date.getSeconds() + 2),
