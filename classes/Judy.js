@@ -4,7 +4,6 @@ const { Routes } = require('discord-api-types/v9');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const schedule = require('node-schedule');
 const fs = require('fs');
-const Config = require('../config.json');
 const Logger = require('./Logger');
 
 module.exports = class Judy {
@@ -18,10 +17,16 @@ module.exports = class Judy {
                 IntentsBitField.Flags.GuildIntegrations
             ]
         });
+
+        try {
+            this._client.config = require('../config.json');
+        } catch (e) {
+            console.error("Cannot retrieve config file, please create a config.json file");
+            process.exit(1);
+        }
     }
 
     async bootstrap() {
-        this._client.config = Config;
         this._client.saveConfig = this.saveConfig;
         this._client.logger = new Logger();
         this._client._commands = new Map();
@@ -41,7 +46,7 @@ module.exports = class Judy {
         await this.registerCommands();
 
         this._client.logger.info("Logging in...");
-        await this._client.login(Config.bot.token);
+        await this._client.login(this._client.config.bot.token);
 
         this._client.logger.info("Loading scheduled tasks...");
         this.scheduleTasks();
@@ -77,14 +82,14 @@ module.exports = class Judy {
     }
 
     async saveConfig() {
-        fs.writeFile('./config.json', JSON.stringify(this.config, null, 4), (err) => {
+        fs.writeFile('./config.json', JSON.stringify(this._client.config, null, 4), (err) => {
             if(err)
                 console.error(err);
         });
     }
 
     async registerCommands() {
-        const rest = new REST({version: '10'}).setToken(Config.bot.token);
+        const rest = new REST({version: '10'}).setToken(this._client.config.bot.token);
         const commandsData = [];
 
         fs.readdirSync('./commands').forEach(file => {
@@ -99,7 +104,14 @@ module.exports = class Judy {
         });
 
         this._client.logger.debug(`Refreshing commands: ${Array.from(this._client._commands.keys()).join(', ')}`);
-        await rest.put(Routes.applicationGuildCommands(Config.bot.clientId, Config.bot.guildId), {body: commandsData});
+        await rest.put(
+            Routes.applicationGuildCommands(
+                this._client.config.bot.clientId,
+                this._client.config.bot.guildId
+            ),
+            {body: commandsData}
+        );
+
         this._client.logger.debug("Done refreshing commands.");
     }
 }
