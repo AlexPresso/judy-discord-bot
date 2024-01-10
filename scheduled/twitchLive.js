@@ -30,7 +30,7 @@ module.exports = {
             startOrEditLiveEvent(client, newState, manager, previousEvent);
             notifyLiveStart(client, newState);
         } else if(oldState && !newState) {
-            stopLiveEvent(client, oldState);
+            stopLiveEvent(client, manager, previousEvent);
         } else {
             startOrEditLiveEvent(client, newState, manager, previousEvent);
         }
