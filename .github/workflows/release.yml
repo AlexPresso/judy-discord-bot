@@ -4,12 +4,8 @@ on:
     branches:
       - main
 
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
-
 jobs:
-  release-on-push:
+  release:
     name: Create Release
     runs-on: ubuntu-latest
     env:
@@ -20,6 +16,13 @@ jobs:
         with:
           bump_version_scheme: minor
 
+  docker-image:
+    name: Create Docker Image
+    runs-on: ubuntu-latest
+    env:
+      REGISTRY: ghcr.io
+      IMAGE_NAME: ${{ github.repository }}
+    steps:
       - name: Check out the repo
         uses: actions/checkout@v4
 
