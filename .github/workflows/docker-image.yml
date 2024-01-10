@@ -2,9 +2,7 @@ name: Release
 on:
   push:
     tags:
-      - 'v*'
-    branches:
-      - main
+      - 'v*.*.*'
 
 jobs:
   docker-image:
