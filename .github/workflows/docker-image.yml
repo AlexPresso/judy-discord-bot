@@ -7,7 +7,6 @@ on:
 jobs:
   docker-image:
     name: Create Docker Image
-    needs: release
     runs-on: ubuntu-latest
     env:
       REGISTRY: ghcr.io
