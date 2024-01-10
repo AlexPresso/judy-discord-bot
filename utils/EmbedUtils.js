@@ -25,7 +25,7 @@ module.exports = class EmbedUtils {
             user = user.user;
 
         return EmbedUtils.messageWithTitleEmbed(title, message).setFooter({
-            text: user.username,
+            text: user.globalName,
             iconURL: user.avatarURL()
         });
     }
@@ -35,7 +35,7 @@ module.exports = class EmbedUtils {
             user = user.user;
 
         return EmbedUtils.messageEmbed(message).setFooter({
-            text: user.username,
+            text: user.globalName,
             iconURL: user.avatarURL()
         });
     }

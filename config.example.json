@@ -1,5 +1,6 @@
 {
   "bot": {
+    "ownerId": "",
     "guildId": "",
     "clientId": "",
     "token": ""
@@ -19,6 +20,13 @@
       "title": "Happy birthday !",
       "message": "Everyone wishes a happy birthday to <@%userId%> !"
     }
+  },
+  "twitch": {
+    "message": "%userName% is live!",
+    "channel": "YourChannel",
+    "discordChannel": "123456789",
+    "clientId": "",
+    "clientSecret": ""
   },
   "commands": [
     "addbirthday",
