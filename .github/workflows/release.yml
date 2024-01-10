@@ -44,10 +44,14 @@ jobs:
             suffix=
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
+      - name: Get the last commit tag
+        id: get_last_commit_tag
+        run: echo "::set-output name=tag::$(git describe --tags --abbrev=0)"
+
       - name: Build and push Docker image
         uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
         with:
           context: .
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: ${{ steps.meta.outputs.tags }}, ${{ steps.get_last_commit_tag.outputs.tag }}
           labels: ${{ steps.meta.outputs.labels }}
