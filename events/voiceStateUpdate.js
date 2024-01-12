@@ -1,6 +1,9 @@
 const { PermissionFlagsBits, ChannelType } = require("discord.js");
 
 module.exports = async (client, oldState, newState) => {
+    if(!client.config.createVoiceChannels)
+        return;
+
     if(oldState.channelId === newState.channelId)
         return;
 
