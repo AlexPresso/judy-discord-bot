@@ -1,10 +1,12 @@
+const {ActivityType} = require("discord-api-types/v10");
+
 module.exports = async client => {
     client.logger.success("Bot ready !");
     client.user.setPresence({
-       status: 'online',
+       status: "online",
        activities: [
            {
-               type: "LISTENING",
+               type: ActivityType.Listening,
                name: "/infos"
            }
        ]
