@@ -1,20 +1,22 @@
-const { Client, IntentsBitField, PermissionFlagsBits} = require('discord.js');
+const { Client, PermissionFlagsBits} = require('discord.js');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const schedule = require('node-schedule');
 const fs = require('fs');
 const Logger = require('./Logger');
+const {GatewayIntentBits} = require("discord-api-types/v10");
 
 module.exports = class Judy {
     constructor() {
         this._client = new Client({
             intents: [
-                IntentsBitField.Flags.Guilds,
-                IntentsBitField.Flags.GuildVoiceStates,
-                IntentsBitField.Flags.GuildMessages,
-                IntentsBitField.Flags.GuildMembers,
-                IntentsBitField.Flags.GuildIntegrations
+                GatewayIntentBits.Guilds,
+                GatewayIntentBits.GuildIntegrations,
+                GatewayIntentBits.GuildMembers,
+                GatewayIntentBits.GuildVoiceStates,
+                GatewayIntentBits.GuildMessages,
+                GatewayIntentBits.MessageContent
             ]
         });
 
@@ -82,7 +84,7 @@ module.exports = class Judy {
     }
 
     async saveConfig() {
-        fs.writeFile('./config.json', JSON.stringify(this._client.config, null, 4), (err) => {
+        fs.writeFile('./config.json', JSON.stringify(this.config, null, 4), (err) => {
             if(err)
                 console.error(err);
         });

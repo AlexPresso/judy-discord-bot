@@ -8,7 +8,13 @@ module.exports = async (client, message) => {
         "Message supprimé",
         `${message.author} a supprimé un message`,
         message.author
-    ).addField("Contenu du message", `\`${message.content}\``, false);
+    ).addFields([
+        {
+            name: "Contenu du message",
+            value: `\`${message.content}\``,
+            inline: false
+        }
+    ]);
 
     message.guild.channels.resolve(client.config.modChannel)?.send({embeds: [embed]});
 }
