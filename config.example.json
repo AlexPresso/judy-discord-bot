@@ -22,11 +22,13 @@
     }
   },
   "twitch": {
+    "enable": false,
     "message": "%userName% is live!",
     "channel": "YourChannel",
     "userId": "YourUserID",
     "liveDiscordChannel": "123456789",
     "replayDiscordChannel": "123456789",
+    "clipDiscordChannel": "123456789",
     "clientId": "",
     "clientSecret": ""
   },

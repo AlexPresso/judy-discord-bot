@@ -37,7 +37,8 @@ module.exports = class Judy {
             tempChannelsCounters: new Map(),
             twitch: {
                 prevState: null,
-                scheduledEvent: null
+                scheduledEvent: null,
+                lastExecTime: null
             }
         }
 
@@ -70,9 +71,11 @@ module.exports = class Judy {
             const scheduledTask = require(`../scheduled/${file}`),
                 name = file.split('.')[0];
 
-            schedule.scheduleJob(scheduledTask.schedule, () => {
+            schedule.scheduleJob(scheduledTask.schedule, async () => {
                 try {
-                    scheduledTask.task(this._client);
+                    this._client.logger.debug(`Running ${name} scheduled task.`)
+                    await scheduledTask.task(this._client);
+                    this._client.logger.debug(`Done running ${name} scheduled task.`)
                 } catch (e) {
                     console.error(e);
                 }
