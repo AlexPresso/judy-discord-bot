@@ -22,5 +22,17 @@ module.exports = {
 
     getThumbnail: (url, width, height) => {
         return Axios.get(url.replace("{width}", width).replace("{height}", height), {responseType: "arraybuffer"})
+    },
+
+    getVideos: (userId, type, period, clientId, token) => {
+        return Axios.get(
+            `https://api.twitch.tv/helix/videos?user_id=${userId}&type=${type}&period=${period}&sort=time`,
+            {
+                headers: {
+                    "Client-ID": clientId,
+                    "Authorization": `Bearer ${token}`
+                }
+            }
+        ).catch(console.error)
     }
 }

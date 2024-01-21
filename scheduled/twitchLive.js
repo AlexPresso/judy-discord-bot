@@ -31,6 +31,7 @@ module.exports = {
             notifyLiveStart(client, newState);
         } else if(oldState && !newState) {
             stopLiveEvent(client, manager, previousEvent);
+            postReplay(client, token.data.access_token);
         } else {
             startOrEditLiveEvent(client, newState, manager, previousEvent);
         }
@@ -51,7 +52,7 @@ async function notifyLiveStart(client, state) {
             .replace("{height}", 1080)
         );
 
-    client.channels.resolve(client.config.twitch.discordChannel)?.send({content: "@everyone", embeds: [embed]});
+    client.channels.resolve(client.config.twitch.liveDiscordChannel)?.send({content: "@everyone", embeds: [embed]});
 }
 
 async function startOrEditLiveEvent(client, state, manager, previousEvent) {
@@ -85,6 +86,21 @@ async function stopLiveEvent(client, manager, previousEvent) {
 
     manager.delete(previousEvent);
     client._state.twitch.prevState = null;
+}
+
+async function postReplay(client, twitchToken)  {
+    const videos = await Twitch.getVideos(
+        client.config.twitch.userId,
+        'archive',
+        'day',
+        client.config.twitch.clientId,
+        twitchToken
+    );
+
+    if(!videos || !videos.data)
+        return;
+
+    client.channels.resolve(client.config.twitch.replayDiscordChannel)?.send(videos.data.data[0].url)
 }
 
 async function getOrFetchPreviousEvent(client, manager) {
