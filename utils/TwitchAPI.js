@@ -34,5 +34,17 @@ module.exports = {
                 }
             }
         ).catch(console.error)
+    },
+
+    getClips: (userId, startedAt, clientId, token) => {
+        return Axios.get(
+            `https://api.twitch.tv/helix/clips?broadcaster_id=${userId}&started_at=${startedAt}`,
+            {
+                headers: {
+                    "Client-ID": clientId,
+                    "Authorization": `Bearer ${token}`
+                }
+            }
+        ).catch(console.error)
     }
 }

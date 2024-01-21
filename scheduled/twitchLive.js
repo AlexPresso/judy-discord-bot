@@ -6,7 +6,7 @@ module.exports = {
     schedule: "* * * * *",
     task: async client => {
         const config = client.config.twitch || {};
-        if(!config.channel)
+        if(!config.channel || !config.enable)
             return;
 
         const token = await Twitch.getToken(config.clientId, config.clientSecret)
@@ -16,6 +16,8 @@ module.exports = {
         const response = await Twitch.getStreams(config.clientId, [config.channel], token.data.access_token);
         if(!response)
             return;
+
+        postClips(client, token.data.access_token);
 
         const newState = response.data.data[0];
         const oldState = client._state.twitch.prevState;
@@ -101,6 +103,24 @@ async function postReplay(client, twitchToken)  {
         return;
 
     client.channels.resolve(client.config.twitch.replayDiscordChannel)?.send(videos.data.data[0].url)
+}
+
+async function postClips(client, token) {
+    const clips = await Twitch.getClips(
+        client.config.twitch.userId,
+        client._state.twitch.lastExecTime || new Date().toISOString(),
+        client.config.twitch.clientId,
+        token
+    );
+    
+    if(!clips || !clips.data)
+        return;
+
+    for(const clip of (clips.data.data || [])) {
+        client.channels.resolve(client.config.twitch.clipDiscordChannel)?.send(clip.url);
+    }
+
+    client._state.twitch.lastExecTime = new Date().toISOString();
 }
 
 async function getOrFetchPreviousEvent(client, manager) {
