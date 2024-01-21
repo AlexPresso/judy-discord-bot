@@ -24,7 +24,9 @@
   "twitch": {
     "message": "%userName% is live!",
     "channel": "YourChannel",
-    "discordChannel": "123456789",
+    "userId": "YourUserID",
+    "liveDiscordChannel": "123456789",
+    "replayDiscordChannel": "123456789",
     "clientId": "",
     "clientSecret": ""
   },
