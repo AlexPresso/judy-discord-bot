@@ -11,11 +11,6 @@
   },
   "birthdays": {
     "channelId": "",
-    "dates": {
-      "12/12": [
-        "123456789"
-      ]
-    },
     "embed": {
       "title": "Happy birthday !",
       "message": "Everyone wishes a happy birthday to <@%userId%> !"

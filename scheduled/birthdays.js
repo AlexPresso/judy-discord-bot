@@ -6,7 +6,7 @@ module.exports = {
         const date = new Date(),
             day = String(date.getDate()).padStart(2, '0'),
             month = String(date.getMonth() + 1).padStart(2, '0'),
-            birthdays = client.config.birthdays.dates[`${month}-${day}`] || [];
+            birthdays = client.persistentData.birthdays.dates[`${month}-${day}`] || [];
 
         for(const userId of birthdays) {
             const embed = EmbedUtils.messageWithTitleEmbed(

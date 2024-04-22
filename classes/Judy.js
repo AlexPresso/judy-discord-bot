@@ -22,6 +22,7 @@ module.exports = class Judy {
 
         try {
             this._client.config = require('../config.json');
+            this._client.persistentData = require('../data.json') || {};
         } catch (e) {
             console.error("Cannot retrieve config file, please create a config.json file");
             process.exit(1);
@@ -29,7 +30,7 @@ module.exports = class Judy {
     }
 
     async bootstrap() {
-        this._client.saveConfig = this.saveConfig;
+        this._client.savePersistentData = this.savePersistentData;
         this._client.logger = new Logger();
         this._client._commands = new Map();
         this._client._state = {
@@ -86,8 +87,8 @@ module.exports = class Judy {
         });
     }
 
-    async saveConfig() {
-        fs.writeFile('./config.json', JSON.stringify(this.config, null, 4), (err) => {
+    async savePersistentData() {
+        fs.writeFile('./data.json', JSON.stringify(this.persistentData, null, 4), (err) => {
             if(err)
                 console.error(err);
         });
