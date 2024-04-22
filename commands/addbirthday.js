@@ -20,7 +20,7 @@ module.exports = {
             ]});
 
         let replaced = false;
-        for(const [date, userIds] of Object.entries(client.config.birthdays.dates)) {
+        for(const [date, userIds] of Object.entries(client.persistentData.birthdays.dates)) {
             if(userIds.includes(user.id)) {
                 client.config.birthdays.dates[date] = userIds.filter(id => id !== user.id);
                 replaced = true;
@@ -28,9 +28,9 @@ module.exports = {
             }
         }
 
-        const previous = client.config.birthdays.dates[`${month}-${day}`] || [];
-        client.config.birthdays.dates[`${month}-${day}`] = [user.id, ...previous];
-        await client.saveConfig();
+        const previous = client.persistentData.birthdays.dates[`${month}-${day}`] || [];
+        client.persistentData.birthdays.dates[`${month}-${day}`] = [user.id, ...previous];
+        await client.savePersistentData();
 
         interaction.reply({embeds: [
             EmbedUtils.successEmbed(`L'anniversaire de ${user} a été ${replaced ? "déplacé" : "ajouté" } au \`${day}-${month}\``)
