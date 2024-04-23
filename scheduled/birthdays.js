@@ -1,7 +1,7 @@
 const EmbedUtils = require('../utils/EmbedUtils');
 
 module.exports = {
-    schedule: "0 1 0 * * *",
+    schedule: "0 0 0 * * *",
     task: async client => {
         const date = new Date(),
             day = String(date.getDate()).padStart(2, '0'),
