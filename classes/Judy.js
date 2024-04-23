@@ -22,7 +22,6 @@ module.exports = class Judy {
 
         try {
             this._client.config = require('../config.json');
-            this._client.persistentData = require('../data.json') || {};
         } catch (e) {
             console.error("Cannot retrieve config file, please create a config.json file");
             process.exit(1);
@@ -30,8 +29,11 @@ module.exports = class Judy {
     }
 
     async bootstrap() {
-        this._client.savePersistentData = this.savePersistentData;
         this._client.logger = new Logger();
+
+        this.loadPersistentData();
+
+        this._client.savePersistentData = this.savePersistentData;
         this._client._commands = new Map();
         this._client._state = {
             tempChannels: new Map(),
@@ -54,6 +56,21 @@ module.exports = class Judy {
 
         this._client.logger.info("Loading scheduled tasks...");
         this.scheduleTasks();
+    }
+
+    loadPersistentData() {
+        if(!fs.existsSync("./data")) {
+            this._client.logger.debug("Creating data directory.");
+            fs.mkdirSync("./data");
+        }
+
+        if(!fs.existsSync("./data/data.json")) {
+            this._client.logger.debug("Creating data.json with default content.")
+            fs.writeFileSync("./data/data.json", fs.readFileSync("./defaultData.json"));
+        }
+
+        this._client.persistentData = require('../data/data.json');
+        this._client.logger.info("Loaded persistent data.");
     }
 
     registerEvents() {
@@ -88,7 +105,7 @@ module.exports = class Judy {
     }
 
     async savePersistentData() {
-        fs.writeFile('./data.json', JSON.stringify(this.persistentData, null, 4), (err) => {
+        fs.writeFile('./data/data.json', JSON.stringify(this.persistentData, null, 4), (err) => {
             if(err)
                 console.error(err);
         });
