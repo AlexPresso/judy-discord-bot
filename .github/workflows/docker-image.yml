@@ -39,6 +39,13 @@ jobs:
             type=semver,pattern={{version}}
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
+      - name: Delete old images
+        uses: actions/delete-package-versions@v5
+        with:
+          package-name: 'judy-discord-bot'
+          package-type: 'container'
+          min-versions-to-keep: 5
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
