@@ -40,7 +40,11 @@ module.exports = {
             .filter(a => a.message.toLowerCase().includes(focused.value))
             .map(a => {
                 const channelName = client.channels.resolve(a.channelId).name;
-                return {name: `#${channelName} ${a.message}`, value: a.uid}
+                let displayMessage = `#${channelName} ${a.message}`;
+                if (displayMessage.length > 50)
+                    displayMessage = displayMessage.slice(0, 47) + '...';
+
+                return {name: displayMessage, value: a.uid}
             })
         );
     },
