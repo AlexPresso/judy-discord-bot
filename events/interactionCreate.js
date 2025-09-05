@@ -1,8 +1,11 @@
 module.exports = async (client, interaction) => {
-    if(!interaction.isCommand())
+    if(!interaction.isAutocomplete() && !interaction.isCommand())
         return;
     if(!client._commands.has(interaction.commandName))
         return;
 
-    client._commands.get(interaction.commandName)(client, interaction);
+    const command = client._commands.get(interaction.commandName);
+    return interaction.isAutocomplete() ?
+        command.autocomplete(client, interaction) :
+        command.handleInteraction(client, interaction);
 }

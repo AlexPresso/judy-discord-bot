@@ -1,5 +1,6 @@
 {
     "birthdays": {
         "dates": {}
-    }
+    },
+    "autoannouncer": []
 }

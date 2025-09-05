@@ -122,7 +122,7 @@ module.exports = class Judy {
             if(!this._client.config.commands.includes(name))
                 return;
 
-            this._client._commands.set(name, command.handleInteraction);
+            this._client._commands.set(name, command);
             commandsData.push(command.init(new SlashCommandBuilder().setName(name), PermissionFlagsBits).toJSON());
         });
 
