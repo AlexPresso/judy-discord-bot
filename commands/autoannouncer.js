@@ -1,5 +1,6 @@
 const crypto = require('crypto');
 const EmbedUtils = require('../utils/EmbedUtils');
+const {days, isValidTime, timeToCron, cronToTime} = require("../utils/TimeUtils");
 
 module.exports = {
     init: (builder, permissions) => {
@@ -14,15 +15,7 @@ module.exports = {
                 .addNumberOption(o => o.setName('jour')
                     .setDescription("jour de l'annonce")
                     .setRequired(false)
-                    .addChoices(
-                        { name: 'Monday', value: 1 },
-                        { name: 'Tuesday', value: 2 },
-                        { name: 'Wednesday', value: 3 },
-                        { name: 'Thursday', value: 4 },
-                        { name: 'Friday', value: 5 },
-                        { name: 'Saturday', value: 6 },
-                        { name: 'Sunday', value: 0 },
-                    )
+                    .addChoices(days)
                 ).addStringOption(o => o.setName('heure')
                     .setDescription("Heure de l'annonce (format 24h, ex: 14:30)")
                     .setRequired(false)
@@ -40,9 +33,11 @@ module.exports = {
             .filter(a => a.message.toLowerCase().includes(focused.value))
             .map(a => {
                 const channelName = client.channels.resolve(a.channelId).name;
-                let displayMessage = `#${channelName} ${a.message}`;
-                if (displayMessage.length > 50)
-                    displayMessage = displayMessage.slice(0, 47) + '...';
+                const stringTime = cronToTime(a.cronTime);
+
+                let displayMessage = `[${stringTime} - #${channelName}]: ${a.message}`;
+                if (displayMessage.length > 100)
+                    displayMessage = displayMessage.slice(0, 97) + '...';
 
                 return {name: displayMessage, value: a.uid}
             })
@@ -54,19 +49,6 @@ module.exports = {
 
         await addAnnounce(client, interaction);
     }
-}
-
-function isValidTime(time) {
-    const regex = /^([01]\d|2[0-3]):([0-5]\d)$/;
-    return regex.test(time);
-}
-
-function timeToCron(dayOfWeek, time) {
-    const match = /^([01]?\d|2[0-3]):([0-5]\d)$/.exec(time);
-    if (!match)
-        throw new Error("time must be in HH:MM 24-hour format");
-
-    return `${match[2]} ${match[1]} * * ${dayOfWeek || "*"}`;
 }
 
 async function addAnnounce(client, interaction) {
