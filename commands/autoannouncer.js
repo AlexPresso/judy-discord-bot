@@ -19,6 +19,9 @@ module.exports = {
                 ).addStringOption(o => o.setName('heure')
                     .setDescription("Heure de l'annonce (format 24h, ex: 14:30)")
                     .setRequired(false)
+                ).addNumberOption(o => o.setName('expiration')
+                    .setDescription("durée (heures) après laquelle supprimer le message")
+                    .setRequired(false)
                 )
             ).addSubcommand(s => s
                 .setName("remove")
@@ -55,7 +58,8 @@ async function addAnnounce(client, interaction) {
     const channel = interaction.options.getChannel('salon'),
         message = interaction.options.getString('message'),
         day = interaction.options.getNumber('jour'),
-        time = interaction.options.getString('heure') || "00:00";
+        time = interaction.options.getString('heure') || "00:00",
+        expiry = interaction.options.getNumber('expiration') || null;
 
     if(time && !isValidTime(time))
         return interaction.reply({embeds: [
@@ -63,12 +67,19 @@ async function addAnnounce(client, interaction) {
         ]});
 
     const cronTime = timeToCron(day, time),
-        existingAnnounces = client.persistentData.autoannouncer || [],
-        newAnnounce = {uid: crypto.randomUUID(), message: message, channelId: channel.id, cronTime: cronTime};
+        existingAnnounces = client.persistentData.autoannouncer || [];
 
     client.persistentData.autoannouncer = [
         ...existingAnnounces,
-        newAnnounce
+        {
+            uid: crypto.randomUUID(),
+            message: message,
+            messageId: null,
+            sentAt: null,
+            channelId: channel.id,
+            cronTime: cronTime,
+            deleteAfter: expiry * 60 * 60 * 1000
+        }
     ];
 
     await client.savePersistentData();
