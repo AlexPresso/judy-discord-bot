@@ -26,7 +26,7 @@ module.exports = {
                 if (
                     parseInt(minutes, 10) === now.getMinutes() &&
                     parseInt(hours, 10) === now.getHours() &&
-                    parseInt(dayOfWeek, 10) === now.getDate()
+                    parseInt(dayOfWeek, 10) === now.getDay()
                 ) {
                     const message = await client.channels.cache.get(announce.channelId)?.send(announce.message);
                     if(message) {
