@@ -2,5 +2,10 @@
     "birthdays": {
         "dates": {}
     },
-    "autoannouncer": []
+    "autoannouncer": [],
+    "twitch": {
+        "prevState": null,
+        "scheduledEvent": null,
+        "lastExecTime": null
+    }
 }

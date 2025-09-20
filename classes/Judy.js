@@ -33,16 +33,13 @@ module.exports = class Judy {
 
         this.loadPersistentData();
 
+        this._client.getDataOrDefault = this.getDataOrDefault;
+        this._client.setPersistentData = this.setPersistentData;
         this._client.savePersistentData = this.savePersistentData;
         this._client._commands = new Map();
         this._client._state = {
             tempChannels: new Map(),
-            tempChannelsCounters: new Map(),
-            twitch: {
-                prevState: null,
-                scheduledEvent: null,
-                lastExecTime: null
-            }
+            tempChannelsCounters: new Map()
         }
 
         this._client.logger.info("Loading events...");
@@ -102,6 +99,41 @@ module.exports = class Judy {
             this._client.logger.debug(`Loaded ${name} scheduled task.`);
             delete require.cache[require.resolve(`../scheduled/${file}`)];
         });
+    }
+
+    getDataOrDefault(path, defaultValue) {
+        const keys = path.split(".");
+        let current = this.persistentData;
+
+        for (let i = 0; i < keys.length; i++) {
+            if (current == null || typeof current !== "object")
+                return defaultValue;
+
+            current = current[keys[i]];
+        }
+
+        return current === undefined || current === null ?
+            defaultValue :
+            current;
+    }
+
+    setPersistentData(path, value) {
+        const keys = path.split(".");
+        let current = this.persistentData;
+
+        for (let i = 0; i < keys.length - 1; i++) {
+            let key = keys[i];
+            let obj = current[key];
+
+            if (obj == null || typeof obj !== "object") {
+                obj = {};
+                current[key] = obj;
+            }
+
+            current = obj;
+        }
+
+        current[keys[keys.length - 1]] = value;
     }
 
     async savePersistentData() {

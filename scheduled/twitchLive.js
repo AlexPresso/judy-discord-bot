@@ -5,7 +5,9 @@ const {GuildScheduledEventEntityType, GuildScheduledEventPrivacyLevel} = require
 module.exports = {
     schedule: "* * * * *",
     task: async client => {
-        const config = client.config.twitch || {};
+        const config = client.config.twitch || {},
+            now = new Date();
+
         if(!config.channel || !config.enable)
             return;
 
@@ -17,10 +19,11 @@ module.exports = {
         if(!response)
             return;
 
-        postClips(client, token.data.access_token);
+        await postClips(client, token.data.access_token, now);
+        await client.savePersistentData();
 
         const newState = response.data.data[0];
-        const oldState = client._state.twitch.prevState;
+        const oldState = client.getDataOrDefault("twitch.prevState", null);
 
         if(!newState && !oldState)
             return;
@@ -29,16 +32,17 @@ module.exports = {
         const previousEvent = await getOrFetchPreviousEvent(client, manager);
 
         if(!oldState && newState) {
-            startOrEditLiveEvent(client, newState, manager, previousEvent);
-            notifyLiveStart(client, newState);
+            await startOrEditLiveEvent(client, newState, manager, previousEvent);
+            await notifyLiveStart(client, newState);
         } else if(oldState && !newState) {
-            stopLiveEvent(client, manager, previousEvent);
-            postReplay(client, token.data.access_token);
+            await stopLiveEvent(client, manager, previousEvent);
+            await postReplay(client, token.data.access_token);
         } else {
-            startOrEditLiveEvent(client, newState, manager, previousEvent);
+            await startOrEditLiveEvent(client, newState, manager, previousEvent);
         }
 
-        client._state.twitch.prevState = newState;
+        client.setPersistentData("twitch.prevState", newState);
+        await client.savePersistentData();
     }
 }
 
@@ -74,12 +78,14 @@ async function startOrEditLiveEvent(client, state, manager, previousEvent) {
         }
     };
 
-    client._state.twitch.scheduledEvent = previousEvent ?
+    const event = previousEvent ?
         manager.edit(previousEvent, options) :
         manager.create({
             scheduledStartTime: Date.now() + 2000,
             ...options
         });
+
+    client.setPersistentData("twitch.scheduledEvent", event);
 }
 
 async function stopLiveEvent(client, manager, previousEvent) {
@@ -87,7 +93,7 @@ async function stopLiveEvent(client, manager, previousEvent) {
         return;
 
     manager.delete(previousEvent);
-    client._state.twitch.prevState = null;
+    client.setPersistentData("twitch.prevState", null);
 }
 
 async function postReplay(client, twitchToken)  {
@@ -105,27 +111,26 @@ async function postReplay(client, twitchToken)  {
     client.channels.resolve(client.config.twitch.replayDiscordChannel)?.send(videos.data.data[0].url)
 }
 
-async function postClips(client, token) {
+async function postClips(client, token, now) {
     const clips = await Twitch.getClips(
         client.config.twitch.userId,
-        client._state.twitch.lastExecTime || new Date().toISOString(),
+        client.getDataOrDefault("twitch.lastExecTime", now.toISOString()),
         client.config.twitch.clientId,
         token
     );
-    
+
+    client.setPersistentData("twitch.lastExecTime", now.toISOString());
     if(!clips || !clips.data)
         return;
 
     for(const clip of (clips.data.data || [])) {
         client.channels.resolve(client.config.twitch.clipDiscordChannel)?.send(clip.url);
     }
-
-    client._state.twitch.lastExecTime = new Date().toISOString();
 }
 
 async function getOrFetchPreviousEvent(client, manager) {
-    if(client._state.twitch.scheduledEvent)
-        return client._state.twitch.scheduledEvent;
+    if(client.getDataOrDefault("twitch.scheduledEvent", null))
+        return client.persistentData.twitch.scheduledEvent;
 
     for(const [_, event] of await manager.fetch()) {
         if(event.entityMetadata?.location?.includes(`https://twitch.tv/${client.config.twitch.channel}`))
