@@ -123,9 +123,22 @@ async function postClips(client, token, now) {
     if(!clips || !clips.data)
         return;
 
+    const alreadySeenClips = client.getDataOrDefault("twitch.alreadySeenClips", []);
+
     for(const clip of (clips.data.data || [])) {
+        if(alreadySeenClips.some(c => c.id === clip.id))
+            continue;
+
         client.channels.resolve(client.config.twitch.clipDiscordChannel)?.send(clip.url);
+        alreadySeenClips.push({
+            id: clip.id,
+            createdAt: clip.created_at
+        });
     }
+
+    // Keep clips state for one hour since Twitch does return clips that are previous to "started_at" parameter...
+    const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+    client.setPersistentData("twitch.alreadySeenClips", alreadySeenClips.filter(c => new Date(c.createdAt) > oneHourAgo));
 }
 
 async function getOrFetchPreviousEvent(client, manager) {
