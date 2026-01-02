@@ -33,9 +33,9 @@ module.exports = class Judy {
 
         this.loadPersistentData();
 
-        this._client.getDataOrDefault = this.getDataOrDefault;
-        this._client.setPersistentData = this.setPersistentData;
-        this._client.savePersistentData = this.savePersistentData;
+        this._client.getDataOrDefault = this.getDataOrDefault.bind(this._client);
+        this._client.setPersistentData = this.setPersistentData.bind(this._client);
+        this._client.savePersistentData = this.savePersistentData.bind(this._client);
         this._client._commands = new Map();
         this._client._state = {
             tempChannels: new Map(),
@@ -137,7 +137,12 @@ module.exports = class Judy {
     }
 
     async savePersistentData() {
-        fs.writeFile('./data/data.json', JSON.stringify(this.persistentData, null, 4), (err) => {
+        const data = this.persistentData;
+        if (!data) {
+            console.error('Cannot save persistent data: data is undefined');
+            return;
+        }
+        fs.writeFile('./data/data.json', JSON.stringify(data, null, 4), (err) => {
             if(err)
                 console.error(err);
         });
